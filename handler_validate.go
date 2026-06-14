@@ -26,7 +26,7 @@ func handlerValidateChirp(w http.ResponseWriter, r *http.Request) {
 	}
 	clean_body := cleanBody(params.Body)
 	respBody := validResponse{
-		CleanedBody: clean_body,
+		CleanBody: clean_body,
 	}
 	respondWithJSON(w, http.StatusOK, respBody)
 }

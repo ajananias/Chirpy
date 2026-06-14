@@ -7,7 +7,7 @@ import (
 )
 
 type validResponse struct {
-	CleanedBody string `json:"cleaned_body"`
+	CleanBody string `json:"clean_body"`
 }
 type errorResponse struct {
 	Error string `json:"error"`
