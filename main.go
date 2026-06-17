@@ -15,6 +15,7 @@ import (
 type apiConfig struct {
 	fileserverHits atomic.Int32
 	db             *database.Queries
+	tokenSecret    string
 }
 
 func main() {
@@ -33,6 +34,7 @@ func main() {
 	apiCfg := apiConfig{
 		fileserverHits: atomic.Int32{},
 		db:             database.New(db),
+		tokenSecret:    os.Getenv("TOKENSECRET"),
 	}
 
 	mux := http.NewServeMux()
