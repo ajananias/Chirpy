@@ -22,7 +22,7 @@ type Chirp struct {
 func (cfg *apiConfig) handlerCreateChirp(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
 		Body string `json:"body"`
-		//UserID uuid.UUID `json:"user_id"`
+		//UserID uuid.UUID `json:"user_id"` --no longer needed
 	}
 
 	bearerToken, err := auth.GetBearerToken(r.Header)
@@ -33,6 +33,7 @@ func (cfg *apiConfig) handlerCreateChirp(w http.ResponseWriter, r *http.Request)
 	validUserID, err := auth.ValidateJWT(bearerToken, cfg.tokenSecret)
 	if err != nil {
 		respondWithError(w, http.StatusUnauthorized, "Failed to validate token", err)
+		return
 	}
 
 	decoder := json.NewDecoder(r.Body)
