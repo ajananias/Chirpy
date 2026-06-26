@@ -16,6 +16,7 @@ type apiConfig struct {
 	fileserverHits atomic.Int32
 	db             *database.Queries
 	tokenSecret    string
+	polkaKey       string
 }
 
 func main() {
@@ -35,6 +36,7 @@ func main() {
 		fileserverHits: atomic.Int32{},
 		db:             database.New(db),
 		tokenSecret:    os.Getenv("TOKENSECRET"),
+		polkaKey:       os.Getenv("POLKA_KEY"),
 	}
 
 	mux := http.NewServeMux()
@@ -51,6 +53,10 @@ func main() {
 	mux.HandleFunc("POST /api/login", apiCfg.handlerAuth)
 	mux.HandleFunc("POST /api/refresh", apiCfg.handlerRefresh)
 	mux.HandleFunc("POST /api/revoke", apiCfg.handlerRevoke)
+	mux.HandleFunc("PUT /api/users", apiCfg.handlerUsers)
+	mux.HandleFunc("DELETE /api/chirps/{chirpID}", apiCfg.handlerDeleteChirp)
+
+	mux.HandleFunc("POST /api/polka/webhooks", apiCfg.handlerWebhooks)
 
 	srv := &http.Server{
 		Handler: mux,

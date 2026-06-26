@@ -21,7 +21,7 @@ VALUES (
     $1,
     $2
 )
-RETURNING id, created_at, updated_at, email, hashed_password
+RETURNING id, created_at, updated_at, email, hashed_password, is_chirpy_red
 `
 
 type CreateUserParams struct {
@@ -38,21 +38,23 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.UpdatedAt,
 		&i.Email,
 		&i.HashedPassword,
+		&i.IsChirpyRed,
 	)
 	return i, err
 }
 
 const getUserFromEmail = `-- name: GetUserFromEmail :one
-SELECT id, created_at, updated_at, email
+SELECT id, created_at, updated_at, email, is_chirpy_red
 FROM users
 WHERE email = $1
 `
 
 type GetUserFromEmailRow struct {
-	ID        uuid.UUID
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	Email     string
+	ID          uuid.UUID
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	Email       string
+	IsChirpyRed bool
 }
 
 func (q *Queries) GetUserFromEmail(ctx context.Context, email string) (GetUserFromEmailRow, error) {
@@ -63,6 +65,35 @@ func (q *Queries) GetUserFromEmail(ctx context.Context, email string) (GetUserFr
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.Email,
+		&i.IsChirpyRed,
 	)
 	return i, err
+}
+
+const updateUser = `-- name: UpdateUser :exec
+UPDATE users
+SET updated_at = NOW(), email = $1, hashed_password = $2
+WHERE id = $3
+`
+
+type UpdateUserParams struct {
+	Email          string
+	HashedPassword string
+	ID             uuid.UUID
+}
+
+func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) error {
+	_, err := q.db.ExecContext(ctx, updateUser, arg.Email, arg.HashedPassword, arg.ID)
+	return err
+}
+
+const upgradeMembership = `-- name: UpgradeMembership :exec
+UPDATE users
+SET is_chirpy_red = TRUE
+where id = $1
+`
+
+func (q *Queries) UpgradeMembership(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, upgradeMembership, id)
+	return err
 }

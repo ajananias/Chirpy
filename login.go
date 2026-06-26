@@ -65,10 +65,11 @@ func (cfg *apiConfig) handlerAuth(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := User{
-		ID:        db_user.ID,
-		CreatedAt: db_user.CreatedAt,
-		UpdatedAt: db_user.UpdatedAt,
-		Email:     db_user.Email,
+		ID:          db_user.ID,
+		CreatedAt:   db_user.CreatedAt,
+		UpdatedAt:   db_user.UpdatedAt,
+		Email:       db_user.Email,
+		IsChirpyRed: db_user.IsChirpyRed,
 	}
 	response := Response{
 		User:         user,
